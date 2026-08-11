@@ -751,11 +751,14 @@
     function logout() {
       sessionStorage.removeItem('user');
       user = null;
+    
       if (window.AppInventor) {
         window.AppInventor.setWebViewString(JSON.stringify({
-          status: "logout"
+          status: "logout",
+          waktu: Date.now()
         }));
       }
+    
       navTo('page-login');
     }
 
