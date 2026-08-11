@@ -734,6 +734,13 @@
       if (res.success) {
         user = res;
         sessionStorage.setItem('user', JSON.stringify(user));
+        if (window.AppInventor) {
+          window.AppInventor.setWebViewString(JSON.stringify({
+            status: "login_success",
+            username: u,
+            password: p
+          }));
+        }
         loadDashboard();
       } else {
         msg.textContent = res.message;
