@@ -751,6 +751,11 @@
     function logout() {
       sessionStorage.removeItem('user');
       user = null;
+      if (window.AppInventor) {
+        window.AppInventor.setWebViewString(JSON.stringify({
+          status: "logout"
+        }));
+      }
       navTo('page-login');
     }
 
