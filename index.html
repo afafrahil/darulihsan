@@ -10,7 +10,7 @@
     :root {
       --primary: #1a7a5e;
       --primary-dark: #145f49;
-      --bg-color: #f4f6f8;
+      --bg-color: transparent !important;
       --card-bg: #ffffff;
       --text-main: #1a3c34;
       --text-muted: #666666;
@@ -28,7 +28,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: transparent !important;
+      background: var(--bg-color);
       color: var(--text-main);
       padding-bottom: 80px;
     }
