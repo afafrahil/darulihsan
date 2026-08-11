@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aplikasi Penilaian (Mobile SPA)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a7a5e;
+      --primary-dark: #145f49;
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-main: #1a3c34;
+      --text-muted: #666666;
+      --border-color: #e2e8f0;
+      --error: #e53e3e;
+      --success: #38a169;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      padding-bottom: 80px;
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Pages */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Login Form */
+    .login-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .login-card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .btn-main {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-main:active {
+      background: var(--primary-dark);
+    }
+
+    .btn-main:disabled {
+      background: #a0aec0;
+    }
+
+    .login-msg {
+      text-align: center;
+      font-size: 13px;
+      color: var(--error);
+      margin-bottom: 12px;
+      min-height: 16px;
+    }
+
+    /* Dashboard / Cards */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header-bar h2 {
+      font-size: 18px;
+    }
+
+    .btn-logout {
+      background: transparent;
+      color: var(--error);
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .item-card:active {
+      background: #f8fafc;
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .item-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Menu Aspek (Rekap View) */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .btn-back {
+      background: #e2e8f0;
+      border: none;
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-back:active {
+      background: #cbd5e0;
+    }
+
+    .page-title {
+      font-size: 16px;
+      font-weight: 700;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .menu-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .menu-btn.kehadiran {
+      grid-column: span 2;
+      background: #2b6cb0;
+    }
+
+    /* Rekap Table */
+    .table-responsive {
+      overflow-x: auto;
+      background: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    td.text-left {
+      text-align: left;
+    }
+
+    .sticky-col {
+      position: sticky;
+      left: 0;
+      background: var(--card-bg);
+      z-index: 1;
+      border-right: 1px solid var(--border-color);
+    }
+
+    th.sticky-col {
+      background: #f8fafc;
+      z-index: 2;
+    }
+
+    /* Input Aspek Table */
+    .input-cell {
+      padding: 4px !important;
+    }
+
+    .input-cell input {
+      width: 60px;
+      padding: 8px 4px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 14px;
+      background: #f8fafc;
+    }
+
+    .input-cell input:focus {
+      border-color: var(--primary);
+      outline: none;
+      background: #fff;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .input-cell select {
+      width: 60px;
+      padding: 8px 4px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: #f8fafc;
+      font-size: 14px;
+      text-align: center;
+      appearance: none;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      padding: 12px 16px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      gap: 12px;
+    }
+
+    .btn-add-col {
+      background: #edf2f7;
+      color: var(--text-main);
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .status-msg {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Read-only value cell */
+    .value-cell {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .value-cell.empty {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px 16px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Modal: Tambah Kolom Penilaian */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 500;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 600px;
+      max-height: 82vh;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-main);
+    }
+
+    .modal-close {
+      background: #edf2f7;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      padding: 8px 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 12px 16px;
+      display: flex;
+      gap: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .modal-footer .btn-secondary {
+      flex: 1;
+      background: #edf2f7;
+      color: var(--text-main);
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-footer .btn-main {
+      flex: 2;
+    }
+
+    .modal-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+      gap: 12px;
+    }
+
+    .modal-row:last-child {
+      border-bottom: none;
+    }
+
+    .modal-siswa-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .modal-siswa-nis {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .modal-row input,
+    .modal-row select {
+      width: 80px;
+      flex-shrink: 0;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      background: #f8fafc;
+    }
+
+    .modal-row input:focus,
+    .modal-row select:focus {
+      border-color: var(--primary);
+      outline: none;
+      background: #fff;
+    }
+
+    /* Column header edit/delete actions */
+    .col-actions {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .col-action-btn {
+      border: none;
+      background: #e2e8f0;
+      color: var(--text-main);
+      font-size: 11px;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .col-action-btn.danger {
+      background: #fed7d7;
+      color: var(--error);
+    }
+
+    .col-action-btn:active {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="loading" class="loading-overlay" style="display:none;">
+    <div
+      style="width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;">
+    </div>
+    <div id="loadingText" style="margin-top: 16px; font-weight: 600; color: var(--text-main);">Memuat...</div>
+  </div>
+  <style>
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
+  <!-- PAGE: LOGIN -->
+  <div id="page-login" class="page">
+    <div class="login-wrapper">
+      <div class="login-card">
+        <h2>Login Guru</h2>
+        <div id="loginMsg" class="login-msg"></div>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <input type="text" id="username" class="input-field" placeholder="Username" required>
+          <input type="password" id="password" class="input-field" placeholder="Password" required>
+          <button type="submit" id="btnLogin" class="btn-main">Masuk</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: DASHBOARD -->
+  <div id="page-dashboard" class="page">
+    <div class="container">
+      <div class="header-bar">
+        <div>
+          <h2>Dashboard</h2>
+          <div style="font-size: 13px; color: var(--text-muted);" id="userGreeting">Halo, Guru</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">Keluar</button>
+      </div>
+      <div class="card-list" id="classList">
+        <!-- Injected -->
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: REKAP & MENU ASPEK -->
+  <div id="page-rekap" class="page">
+    <div class="container">
+      <div class="top-nav">
+        <button class="btn-back" onclick="navTo('page-dashboard')">&larr;</button>
+        <div class="page-title" id="rekapTitle">Kelas - Mapel</div>
+      </div>
+
+      <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Input Nilai Berdasarkan Aspek:</div>
+      <div class="menu-grid">
+        <button class="menu-btn" onclick="openAspek('PENGETAHUAN')">Pengetahuan</button>
+        <button class="menu-btn" onclick="openAspek('KETERAMPILAN')">Keterampilan</button>
+        <button class="menu-btn" onclick="openAspek('SPIRITUAL')">Spiritual</button>
+        <button class="menu-btn" onclick="openAspek('SOSIAL')">Sosial</button>
+        <button class="menu-btn kehadiran" onclick="openAspek('KEHADIRAN')">Kehadiran</button>
+      </div>
+
+      <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Rangkuman Nilai (Read-Only)</div>
+      <div class="table-responsive">
+        <table id="tableRekap">
+          <thead>
+            <tr>
+              <th class="sticky-col">Nama Siswa</th>
+              <th>Peng.</th>
+              <th>Ket.</th>
+              <th>Spi.</th>
+              <th>Sos.</th>
+              <th>H</th>
+              <th>S</th>
+              <th>I</th>
+              <th>A</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyRekap"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: INPUT ASPEK -->
+  <div id="page-aspek" class="page">
+    <div class="container">
+      <div class="top-nav">
+        <button class="btn-back" onclick="openRekap(currentClass.kelas, currentClass.mapel)">&larr;</button>
+        <div class="page-title" id="aspekTitle">Input Nilai</div>
+      </div>
+
+      <div class="table-responsive" style="margin-bottom: 12px;">
+        <table id="tableAspek">
+          <thead id="theadAspek"></thead>
+          <tbody id="tbodyAspek"></tbody>
+        </table>
+      </div>
+      <div id="saveMsg" class="status-msg" style="margin-bottom: 90px;"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn-main" onclick="addKolomPenilaian()">+ Tambah Kolom Penilaian</button>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH KOLOM PENILAIAN -->
+  <div id="modalKolom" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="modalKolomTitle">Tambah Penilaian</div>
+        <button class="modal-close" onclick="closeModalKolom()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalKolomBody">
+        <!-- Injected -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModalKolom()">Batal</button>
+        <button id="btnSimpanKolom" class="btn-main" onclick="simpanKolomModal()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbwBUWoP3k6rSErFwYzUL3lcFftiw_u4aKgf2-XKvO9SbX_RVkN6NwbyUXJhEBX7AaCnfQ/exec";
+    // TODO: Ganti dengan URL deployment Google Apps Script yang baru!
+
+    // ==========================================
+    // STATE
+    // ==========================================
+    let user = null;
+    let assignments = [];
+    let currentClass = null; // {kelas, mapel}
+    let currentAspek = null; // String: 'PENGETAHUAN'
+    let aspekData = null; // {siswa:[], nilai:{}, maxPenilaian}
+
+    // ==========================================
+    // CORE UTILS
+    // ==========================================
+    async function apiCall(action, params = {}) {
+      const payload = Object.assign({ action }, params);
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        return res.json();
+      } catch (e) {
+        console.error("API Error:", e);
+        return { success: false, message: "Koneksi ke server gagal." };
+      }
+    }
+
+    function showLoading(show, text = 'Memuat...') {
+      document.getElementById('loadingText').textContent = text;
+      document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    function navTo(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    // ==========================================
+    // AUTHENTICATION
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check URL parameters for Kodular auto-login
+      const params = new URLSearchParams(window.location.search);
+      const u = params.get('username');
+      const p = params.get('password');
+
+      if (u && p) {
+        doLogin(u, p);
+      } else {
+        const savedUser = sessionStorage.getItem('user');
+        if (savedUser) {
+          user = JSON.parse(savedUser);
+          loadDashboard();
+        } else {
+          navTo('page-login');
+        }
+      }
+    });
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      doLogin(u, p);
+    }
+
+    async function doLogin(u, p) {
+      const btn = document.getElementById('btnLogin');
+      const msg = document.getElementById('loginMsg');
+      if (btn) btn.disabled = true;
+      msg.textContent = '';
+      showLoading(true, 'Autentikasi...');
+
+      const res = await apiCall('login', { username: u, password: p });
+
+      if (btn) btn.disabled = false;
+      showLoading(false);
+
+      if (res.success) {
+        user = res;
+        sessionStorage.setItem('user', JSON.stringify(user));
+        loadDashboard();
+      } else {
+        msg.textContent = res.message;
+        navTo('page-login');
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('user');
+      user = null;
+      navTo('page-login');
+    }
+
+    // ==========================================
+    // DASHBOARD
+    // ==========================================
+    async function loadDashboard() {
+      navTo('page-dashboard');
+      document.getElementById('userGreeting').textContent = 'Halo, ' + user.nama;
+
+      showLoading(true, 'Memuat daftar kelas...');
+      const res = await apiCall('getGuruAssignments', { username: user.username });
+      showLoading(false);
+
+      if (!res.success) {
+        alert(res.message);
+        return;
+      }
+
+      assignments = res.data;
+      const listEl = document.getElementById('classList');
+      listEl.innerHTML = '';
+
+      assignments.forEach(a => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <div>
+            <div class="item-title">${a.mapel}</div>
+            <div class="item-subtitle">Kelas ${a.kelas}</div>
+          </div>
+          <div style="color: var(--primary); font-weight: bold;">&rarr;</div>
+        `;
+        card.onclick = () => openRekap(a.kelas, a.mapel);
+        listEl.appendChild(card);
+      });
+    }
+
+    // ==========================================
+    // REKAP & MENU ASPEK
+    // ==========================================
+    async function openRekap(kelas, mapel) {
+      currentClass = { kelas, mapel };
+      navTo('page-rekap');
+      document.getElementById('rekapTitle').textContent = `${kelas} • ${mapel}`;
+
+      const tbody = document.getElementById('tbodyRekap');
+      tbody.innerHTML = '<tr><td colspan="9">Memuat...</td></tr>';
+
+      const res = await apiCall('getRekapNilaiKelas', { kelas, mapel });
+      if (!res.success) {
+        tbody.innerHTML = `<tr><td colspan="9" style="color:red;">${res.message}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      res.siswa.forEach(s => {
+        const n = res.rekap[s.nis] || { pengetahuan: 0, keterampilan: 0, spiritual: 0, sosial: 0, hadir: 0, sakit: 0, izin: 0, alfa: 0 };
+        tbody.innerHTML += `
+          <tr>
+            <td class="sticky-col text-left">${s.nama}</td>
+            <td>${n.pengetahuan}</td>
+            <td>${n.keterampilan}</td>
+            <td>${n.spiritual}</td>
+            <td>${n.sosial}</td>
+            <td>${n.hadir}</td>
+            <td>${n.sakit}</td>
+            <td>${n.izin}</td>
+            <td>${n.alfa}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // ==========================================
+    // INPUT ASPEK
+    // ==========================================
+    async function openAspek(aspek) {
+      currentAspek = aspek;
+      navTo('page-aspek');
+      document.getElementById('aspekTitle').textContent = `Input ${aspek}`;
+
+      showLoading(true, 'Memuat data siswa...');
+      const res = await apiCall('getAspekNilai', {
+        kelas: currentClass.kelas,
+        mapel: currentClass.mapel,
+        aspek: aspek
+      });
+      showLoading(false);
+
+      if (!res.success) {
+        alert(res.message);
+        openRekap(currentClass.kelas, currentClass.mapel);
+        return;
+      }
+
+      aspekData = res;
+      // Recompute maxPenilaian from actual saved data only (don't force a blank column)
+      aspekData.maxPenilaian = computeMaxPenilaian_(aspekData.nilai);
+
+      renderAspekTable();
+    }
+
+    function computeMaxPenilaian_(nilaiMap) {
+      let max = 0;
+      Object.values(nilaiMap || {}).forEach(m => {
+        Object.keys(m).forEach(k => {
+          const n = parseInt(k, 10);
+          if (!isNaN(n) && n > max) max = n;
+        });
+      });
+      return max;
+    }
+
+    function renderAspekTable() {
+      const thead = document.getElementById('theadAspek');
+      const tbody = document.getElementById('tbodyAspek');
+
+      // Render Header
+      let thHTML = `<tr><th class="sticky-col text-left">Nama Siswa</th>`;
+      for (let i = 1; i <= aspekData.maxPenilaian; i++) {
+        thHTML += `<th>
+          <div>P-${i}</div>
+          <div class="col-actions">
+            <button class="col-action-btn" onclick="openEditKolom(${i})" title="Edit P-${i}">✎</button>
+            <button class="col-action-btn danger" onclick="hapusKolom(${i})" title="Hapus P-${i}">🗑</button>
+          </div>
+        </th>`;
+      }
+      thHTML += `</tr>`;
+      thead.innerHTML = thHTML;
+
+      // Render Body (Read-Only)
+      tbody.innerHTML = '';
+
+      if (aspekData.maxPenilaian === 0) {
+        tbody.innerHTML = `<tr><td colspan="1" class="empty-state">Belum ada penilaian. Tekan "+ Tambah Kolom Penilaian" di bawah untuk mulai input nilai.</td></tr>`;
+        return;
+      }
+
+      aspekData.siswa.forEach(s => {
+        const nMap = aspekData.nilai[s.nis] || {};
+        let tr = document.createElement('tr');
+
+        let tdHTML = `<td class="sticky-col text-left">
+          <div style="font-weight:600; font-size:13px; max-width:140px; overflow:hidden; text-overflow:ellipsis;">${s.nama}</div>
+          <div style="font-size:11px; color:var(--text-muted);">${s.nis}</div>
+        </td>`;
+
+        for (let i = 1; i <= aspekData.maxPenilaian; i++) {
+          const val = nMap[i];
+          const hasVal = val !== undefined && val !== '';
+          tdHTML += `<td class="value-cell ${hasVal ? '' : 'empty'}">${hasVal ? val : '-'}</td>`;
+        }
+
+        tr.innerHTML = tdHTML;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ==========================================
+    // MODAL: TAMBAH / EDIT KOLOM PENILAIAN
+    // ==========================================
+    function addKolomPenilaian() {
+      const nextNo = aspekData.maxPenilaian + 1;
+      openKolomModal_(nextNo, false);
+    }
+
+    function openEditKolom(noPen) {
+      openKolomModal_(noPen, true);
+    }
+
+    function openKolomModal_(noPen, isEdit) {
+      document.getElementById('modalKolomTitle').textContent =
+        (isEdit ? 'Edit' : 'Tambah') + ` Penilaian P-${noPen}`;
+
+      const body = document.getElementById('modalKolomBody');
+      body.innerHTML = '';
+
+      aspekData.siswa.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'modal-row';
+
+        const nMap = aspekData.nilai[s.nis] || {};
+        const existingVal = isEdit && nMap[noPen] !== undefined ? nMap[noPen] : '';
+
+        let fieldHTML;
+        if (currentAspek === 'KEHADIRAN') {
+          const opts = [{ v: '', label: '-' }, { v: 'H', label: 'H' }, { v: 'S', label: 'S' }, { v: 'I', label: 'I' }, { v: 'A', label: 'A' }];
+          const curUpper = existingVal ? String(existingVal).toUpperCase() : '';
+          fieldHTML = `<select data-nis="${s.nis}" data-nopen="${noPen}">` +
+            opts.map(o => `<option value="${o.v}" ${o.v === curUpper ? 'selected' : ''}>${o.label}</option>`).join('') +
+            `</select>`;
+        } else {
+          fieldHTML = `<input type="number" min="0" max="100" data-nis="${s.nis}" data-nopen="${noPen}" value="${existingVal}">`;
+        }
+
+        row.innerHTML = `
+          <div>
+            <div class="modal-siswa-name">${s.nama}</div>
+            <div class="modal-siswa-nis">${s.nis}</div>
+          </div>
+          ${fieldHTML}
+        `;
+        body.appendChild(row);
+      });
+
+      document.getElementById('modalKolom').classList.add('active');
+    }
+
+    function closeModalKolom() {
+      document.getElementById('modalKolom').classList.remove('active');
+    }
+
+    async function simpanKolomModal() {
+      const btn = document.getElementById('btnSimpanKolom');
+      btn.disabled = true;
+
+      const inputs = document.querySelectorAll('#modalKolomBody input, #modalKolomBody select');
+      const flatData = [];
+
+      inputs.forEach(el => {
+        const val = el.value.trim();
+        if (val !== '') {
+          flatData.push({
+            nis: el.getAttribute('data-nis'),
+            nama: aspekData.siswa.find(s => s.nis === el.getAttribute('data-nis')).nama,
+            noPenilaian: el.getAttribute('data-nopen'),
+            nilai: currentAspek === 'KEHADIRAN' ? val.toUpperCase() : Number(val)
+          });
+        }
+      });
+
+      if (!flatData.length) {
+        btn.disabled = false;
+        alert('Isi minimal satu nilai sebelum menyimpan.');
+        return;
+      }
+
+      showLoading(true, 'Menyimpan & Merekap...');
+
+      const res = await apiCall('saveAspekNilai', {
+        kelas: currentClass.kelas,
+        mapel: currentClass.mapel,
+        aspek: currentAspek,
+        data: flatData
+      });
+
+      showLoading(false);
+      btn.disabled = false;
+
+      const msg = document.getElementById('saveMsg');
+
+      if (res.success) {
+        // Merge newly saved values into local state and re-render read-only table
+        flatData.forEach(item => {
+          if (!aspekData.nilai[item.nis]) aspekData.nilai[item.nis] = {};
+          aspekData.nilai[item.nis][item.noPenilaian] = item.nilai;
+        });
+        aspekData.maxPenilaian = computeMaxPenilaian_(aspekData.nilai);
+        renderAspekTable();
+        closeModalKolom();
+
+        msg.style.color = 'var(--success)';
+        msg.textContent = 'Tersimpan & Terekap ✓';
+        setTimeout(() => msg.textContent = '', 3000);
+      } else {
+        msg.style.color = 'var(--error)';
+        msg.textContent = 'Gagal: ' + res.message;
+      }
+    }
+
+    async function hapusKolom(noPen) {
+      if (!confirm(`Yakin ingin menghapus semua nilai pada kolom P-${noPen}? Tindakan ini tidak bisa dibatalkan.`)) return;
+
+      showLoading(true, 'Menghapus...');
+
+      const res = await apiCall('deleteAspekNilai', {
+        kelas: currentClass.kelas,
+        mapel: currentClass.mapel,
+        aspek: currentAspek,
+        noPenilaian: noPen
+      });
+
+      showLoading(false);
+
+      const msg = document.getElementById('saveMsg');
+
+      if (res.success) {
+        Object.keys(aspekData.nilai).forEach(nis => {
+          if (aspekData.nilai[nis][noPen] !== undefined) delete aspekData.nilai[nis][noPen];
+        });
+        aspekData.maxPenilaian = computeMaxPenilaian_(aspekData.nilai);
+        renderAspekTable();
+
+        msg.style.color = 'var(--success)';
+        msg.textContent = `Kolom P-${noPen} dihapus ✓`;
+        setTimeout(() => msg.textContent = '', 3000);
+      } else {
+        msg.style.color = 'var(--error)';
+        msg.textContent = 'Gagal: ' + res.message;
+      }
+    }
+
+  </script>
+</body>
+
+</html>
