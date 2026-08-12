@@ -224,10 +224,34 @@
     /* Rekap Table */
     .table-responsive {
       overflow-x: auto;
+      overflow-y: auto;
       background: var(--card-bg);
       border-radius: 10px;
       border: 1px solid var(--border-color);
     }
+
+    #page-aspek .container,
+    #page-rekap .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #page-rekap .table-responsive,
+    #page-aspek .table-responsive {
+      flex: 1;
+      min-height: 0;
+      max-height: none;
+    }
+
+    /*
+    #page-rekap .table-responsive {
+      max-height: 55vh;
+    }
+    #page-aspek .table-responsive {
+      max-height: 65vh;
+    }
+    */
 
     table {
       width: 100%;
@@ -244,9 +268,17 @@
     }
 
     th {
+      position: sticky;
+      top: 0;
       background: #f8fafc;
       font-weight: 600;
       color: var(--text-muted);
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+      z-index: 2;
+      /* biar selalu di atas isi tabel saat scroll */
     }
 
     td.text-left {
@@ -263,7 +295,7 @@
 
     th.sticky-col {
       background: #f8fafc;
-      z-index: 2;
+      z-index: 3;
     }
 
     /* Input Aspek Table */
@@ -557,7 +589,6 @@
     <div class="container">
       <div class="header-bar">
         <div>
-          <h2>Dashboard</h2>
           <div style="font-size: 13px; color: var(--text-muted);" id="userGreeting">Assalamualaikum, Guru</div>
         </div>
         <button class="btn-logout" onclick="logout()">Keluar</button>
@@ -1065,4 +1096,5 @@
   </script>
 </body>
 
+</html>
 </html>
